@@ -227,7 +227,7 @@ class TemplateX {
 	 * @return bool Whether or not the values match.
 	 */
 	public function is( $property, $value ) {
-		return $this->get( $property ) === $value;
+		return $this->get( $property ) == $value;
 	}
 
 	/**
