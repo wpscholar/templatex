@@ -99,17 +99,17 @@ class TemplateX {
 
 		$value = false;
 
-		if ( is_array( $data ) && array_key_exists( $path, $data ) ) {
+		if ( \is_array( $data ) && array_key_exists( $path, $data ) ) {
 			$value = true;
-		} else if ( is_object( $data ) && property_exists( $data, $path ) ) {
+		} else if ( \is_object( $data ) && property_exists( $data, $path ) ) {
 			$value = true;
-		} else if ( is_array( $path ) || ( is_string( $path ) && false !== strpos( $path, '.' ) ) ) {
-			$segments = is_array( $path ) ? $path : explode( '.', $path );
+		} else if ( \is_array( $path ) || ( \is_string( $path ) && false !== strpos( $path, '.' ) ) ) {
+			$segments = \is_array( $path ) ? $path : explode( '.', $path );
 			foreach ( $segments as $segment ) {
-				if ( is_array( $data ) && array_key_exists( $segment, $data ) ) {
+				if ( \is_array( $data ) && array_key_exists( $segment, $data ) ) {
 					$value = true;
 					$data = $data[ $segment ];
-				} else if ( is_object( $data ) && property_exists( $data, $segment ) ) {
+				} else if ( \is_object( $data ) && property_exists( $data, $segment ) ) {
 					$value = true;
 					$data = $data->{$segment};
 				} else {
@@ -148,16 +148,16 @@ class TemplateX {
 
 		$value = $default;
 
-		if ( is_array( $data ) && array_key_exists( $path, $data ) ) {
+		if ( \is_array( $data ) && array_key_exists( $path, $data ) ) {
 			$value = $data[ $path ];
-		} else if ( is_object( $data ) && property_exists( $data, $path ) ) {
+		} else if ( \is_object( $data ) && property_exists( $data, $path ) ) {
 			$value = $data->{$path};
-		} else if ( is_array( $path ) || ( is_string( $path ) && false !== strpos( $path, '.' ) ) ) {
-			$segments = is_array( $path ) ? $path : explode( '.', $path );
+		} else if ( \is_array( $path ) || ( \is_string( $path ) && false !== strpos( $path, '.' ) ) ) {
+			$segments = \is_array( $path ) ? $path : explode( '.', $path );
 			foreach ( $segments as $segment ) {
-				if ( is_array( $data ) && array_key_exists( $segment, $data ) ) {
+				if ( \is_array( $data ) && array_key_exists( $segment, $data ) ) {
 					$value = $data = $data[ $segment ];
-				} else if ( is_object( $data ) && property_exists( $data, $segment ) ) {
+				} else if ( \is_object( $data ) && property_exists( $data, $segment ) ) {
 					$value = $data = $data->{$segment};
 				} else {
 					$value = $default;
@@ -191,8 +191,8 @@ class TemplateX {
 	 */
 	public function setIn( $data, $path, $value ) {
 
-		if ( ! is_array( $path ) || ! ( is_string( $path ) && false !== strpos( $path, '.' ) ) ) {
-			if ( is_object( $data ) ) {
+		if ( ! \is_array( $path ) || ! ( \is_string( $path ) && false !== strpos( $path, '.' ) ) ) {
+			if ( \is_object( $data ) ) {
 				$data->{$path} = $value;
 			} else if ( is_array( $data ) ) {
 				$data[ $path ] = $value;
@@ -203,7 +203,7 @@ class TemplateX {
 				);
 			}
 		} else {
-			$segments = is_array( $path ) ? $path : explode( '.', $path );
+			$segments = \is_array( $path ) ? $path : explode( '.', $path );
 			$segment = array_shift( $segments );
 			if ( empty( $segments ) ) {
 				$this->setIn( $data, $segment, $value );
@@ -245,8 +245,11 @@ class TemplateX {
 	 * @param string $template Relative path to the template file to be loaded.
 	 * @param array $vars An associative array containing variable names and values to be scoped to the current template.
 	 * @param bool $withContext Whether or not to keep the existing context when loading the template.
+	 * @param bool $echo Whether or not to echo the output (as opposed to returning the output).
+	 *
+	 * @return string
 	 */
-	public function load( $template, array $vars = [], $withContext = true ) {
+	public function load( $template, array $vars = [], $withContext = true, $echo = true ) {
 		if ( $withContext ) {
 			$vars = array_merge( $this->vars, $vars );
 		}
@@ -254,7 +257,14 @@ class TemplateX {
 		$x->setTemplatePaths( $this->templatePaths );
 		$x->setTemplate( $template );
 		$x->setContext( $vars );
-		echo $x->render();
+
+		$output = $x->render();
+
+		if ( ! $echo ) {
+			return $output;
+		}
+
+		echo $output;
 	}
 
 	/**
